@@ -1,0 +1,40 @@
+name: Build CampusConnect APK
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'android/**'
+      - '.github/workflows/android-apk.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CAMPUSDESK_API_BASE_URL: ${{ vars.CAMPUSDESK_API_BASE_URL || 'https://campusdesk-api-j6os.onrender.com' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Validate HTTPS backend URL
+        shell: bash
+        run: |
+          if [[ "$CAMPUSDESK_API_BASE_URL" != https://* ]]; then
+            echo "CAMPUSDESK_API_BASE_URL must start with https://"
+            exit 1
+          fi
+      - name: Build debug APK
+        run: gradle -p android assembleDebug "-PcampusdeskApiBaseUrl=$CAMPUSDESK_API_BASE_URL"
+      - name: Verify APK exists
+        run: test -f android/app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CampusConnect-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7

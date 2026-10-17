@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: campusdesk-api
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    disk:
+      name: campusdesk-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: CAMPUSDESK_DB
+        value: /var/data/campusdesk.db
+      - key: CAMPUSDESK_ADMIN_PASSWORD
+        generateValue: true
+      - key: CAMPUSDESK_SEED_DEMO_USERS
+        value: "false"

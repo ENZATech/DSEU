@@ -1,0 +1,9 @@
+backend/campusdesk.db
+backend/campusdesk.db-*
+backend/__pycache__/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.iml
+.idea/
